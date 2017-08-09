@@ -242,9 +242,9 @@ function islandora_paged_content_create_ocr_batch(AbstractObject $paged_content,
  */
 function islandora_paged_content_create_ocr_batch_operation(array $pages, array $options, &$context) {
   module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
-  $page = islandora_paged_content_start_batch_operation($pages, $context);
-  if ($page) {
-    $page = islandora_object_load($page);
+  $page_pid = islandora_paged_content_start_batch_operation($pages, $context);
+  if ($page_pid) {
+    $page = islandora_object_load($page_pid);
     $ocr = islandora_paged_content_page_generate_ocr_datastreams($page, $options, FALSE);
     foreach ($ocr as $dsid => $result) {
       if ($result !== FALSE) {
@@ -257,12 +257,13 @@ function islandora_paged_content_create_ocr_batch_operation(array $pages, array 
       }
     }
     // Add this orphan file reference for cleanup during the callback_batch_finished.
-    $context['results']['files'][] = 'temporary://' . str_replace(":", "_", $page) . '_OBJ.tif';
+    $context['results']['files'][] = 'temporary://' . str_replace(":", "_", $page_pid) . '_OBJ.tif';
 
     islandora_paged_content_end_batch_operation($context, 1, array(
-      'Derived @derived of @set_size OCR/HOCR datastreams.',
+      'Derived @derived of @set_size OCR/HOCR datastreams / page PID @page_pid.',
       array(
         '@set_size' => count($context['results']['successful']),
+        '@page_pid' => $page_pid,
         '@derived' => count(array_filter($context['results']['successful'])),
       )));
     $context['message'] = t('Performing OCR on page @page of @total ...', array(
