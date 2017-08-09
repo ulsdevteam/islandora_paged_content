@@ -65,6 +65,12 @@ function islandora_paged_content_end_batch_operation(&$context, $count = 1, $mes
     return FALSE;
   }
   $context['results']['messages'][] = $message;
+  if (isset($message[0]) && strstr($message[0], 'OCR/HOCR datastreams') && isset($message[1]) && isset($message[1]['@page_pid'])) {
+    // For cleanup of the gearman record
+    $page_pid = $message[1]['@page_pid'];
+    module_invoke_all('islandora_paged_content_OCR_batch_operation_finished', $page_pid);
+  }
+
   return TRUE;
 }
 
@@ -266,7 +272,8 @@ function islandora_paged_content_create_ocr_batch_operation(array $pages, array 
         '@page_pid' => $page_pid,
         '@derived' => count(array_filter($context['results']['successful'])),
       )));
-    $context['message'] = t('Performing OCR on page @page of @total ...', array(
+    $context['message'] = t('Performing OCR on page @page of @total / page PID @page_pid...', array(
+                            '@page_pid' => $page_pid,
                             '@page' => $context['sandbox']['progress'],
                             '@total' => $context['sandbox']['total']));
   }
