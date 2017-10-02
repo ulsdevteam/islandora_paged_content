@@ -65,6 +65,8 @@ function islandora_paged_content_end_batch_operation(&$context, $count = 1, $mes
     return FALSE;
   }
   $context['results']['messages'][] = $message;
+error_log('in islandora_paged_content_end_batch_operation - $message[0] = ' . print_r($message[0], true));
+error_log(print_r($message[1], true));
   if (isset($message[0]) && strstr($message[0], 'OCR/HOCR datastreams') && isset($message[1]) && isset($message[1]['@page_pid'])) {
     // For cleanup of the gearman record
     $page_pid = $message[1]['@page_pid'];
