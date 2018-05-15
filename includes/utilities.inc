@@ -137,6 +137,8 @@ function islandora_paged_content_get_pages_solr(AbstractObject $object) {
     $height_field,
     $width_field,
   ));
+  // Do not treat pages like they are to the site filter - or suppress from search results. 
+  $qp->solrParams['fq'] = 'PID:(pitt*)';
   $qp->solrStart = 0;
   $qp->solrLimit = 100000;
   $qp->executeQuery(FALSE);
